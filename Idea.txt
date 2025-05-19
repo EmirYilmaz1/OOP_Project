@@ -1,0 +1,8 @@
+The project is about managing a dance studio using object oriented programming. There will be a base class called Person, and two types of people: Instructor and Customer.
+
+Each Instructor will be specific to a dance type. So there will be BalletInstructor, HipHopInstructor, SalsaInstructor,et . Each of them teaches differently. For example, they can have different session times, get paid differently, or need special equipment or classroom. Some dances going to require specific conditions. For example tango needs partners.
+
+Customers will start with 10 hours when they join. Every time they take a class, their hours will decrease. When they finish it, they have to buy more hours. After a certain number of classes, they can earn a certificate. Instructors earn money after each lesson they teach. 
+
+Also Customer can get a refund from the hours they have. But refund going to be half of the money that they give. For example lets say 1 hours cost 20 euro. When customer wants to refund his 3 hours he is going to get 30 euro.  
+
