@@ -1,11 +1,15 @@
 #include<iostream>
 #include<cmath>
+#include<list>
 
 using namespace std;
 
+void BuyHour(int hour, Customer customer);
+void RefundRemaningHours(int hour, Human& human);
+bool CheckForTheHours(list<Customer*> customer, int lesson_hour);
+bool CheckForThePairs(list<Customer*> customer) ;
 
-
-enum class DanceTypes // I usualy use enums when I'm programing games thats why also in this project, I think its way more safer than string.
+enum class DanceStyle // I usualy use enums when I'm programing games thats why also used in this project, I think its way more safer than string.
 {
     Salsa,
     Folk,
@@ -13,19 +17,19 @@ enum class DanceTypes // I usualy use enums when I'm programing games thats why 
     Ballet
 };
 
-string EnumToString(DanceTypes type) 
+string EnumToString(DanceStyle style) 
 {
-    switch (type) {
-        case DanceTypes::Ballet: 
+    switch (style) {
+        case DanceStyle::Ballet: 
         return "Ballet";
         
-        case DanceTypes::HipHop: 
+        case DanceStyle::HipHop: 
         return "HipHop";
         
-        case DanceTypes::Salsa: 
+        case DanceStyle::Salsa: 
         return "Salsa";
         
-        case DanceTypes::Folk: 
+        case DanceStyle::Folk: 
         return "Folk";
 
         default: 
@@ -33,37 +37,62 @@ string EnumToString(DanceTypes type)
     }
 }
 
+
 class Human
 {
     private:
-    DanceTypes Current_Dance;
-    int Profession_On_Current_Dance = 0;
 
     string Name = "";
-    bool Is_Male = false;
     int Age = 0;
     int Money = 0 ;
+    bool Is_Male = false;
 
-    protected:
-
+    DanceStyle Current_Dance;
+    int Profession_On_Current_Dance = 0;
 
     public:
-    
+
     string GetName()
     {
         return Name;
+    }
+
+    void SetName()
+    {
+        cout<<"Please enter the new name of customer: ";
+        cin>>Name;
+    }    
+
+    void SetMoney(int money)
+    {   
+        Money += money;
+    }
+
+    int GetMoney()
+    {
+        return Money;
+    }
+
+    bool GetGender()
+    {
+        return Is_Male;
     }
 
     int GetProfessionOnCurrentDance()
     {
         return Profession_On_Current_Dance;
     }
-
-    void IncreaseProfessionOnCurrentDance(int hour)
+    
+    void SetProfessionOnCurrentDance(int hour, bool is_Changing_Dance_Style = false)
     {
-        if(hour<1)
+
+        if(hour = 0 && is_Changing_Dance_Style)
         {
-            cout<<"You entered a wrong input. Hour cant be smaller than 1!"<<endl;
+            Profession_On_Current_Dance = 0; // If customer changes the dance style the process going to be start zero again.
+        }
+        else if(hour<1)
+        {
+            cout<<"You entered a wrong input. Hour cannot be smaller than 1!"<<endl;
         }
         else
         {
@@ -71,24 +100,26 @@ class Human
         }
     }
 
-    DanceTypes GetCurrentDance()
+    DanceStyle GetCurrentDance()
     {
         return Current_Dance;
     }
-    
-    virtual void SetDanceType(DanceTypes type)
+
+    virtual void SetDanceType(DanceStyle style)
     {
-        Current_Dance = type;
+        Current_Dance = style;
         cout<<Name<< "change their dance style"<<endl;
+        SetProfessionOnCurrentDance(0,true);
     }
- 
+
+
 
 
     virtual void GetInformation() = 0;
     virtual void Dance() = 0;
 
 
-    Human(string name, int age, int money, DanceTypes current_Dance, bool is_male)
+    Human(string name, int age, int money, DanceStyle current_Dance, bool is_male)
     {
         Name = name;
         Age = age;
@@ -103,11 +134,14 @@ class Customer: public Human
 {
     private:
     int Remaining_Hours = 0;
-    bool Did_Earn_A_Certificate = false;
+    bool Certificate = false;
 
     public:
      
-
+    int GetRemainingHours()
+    {
+        return Remaining_Hours;
+    }
 
     void SetRemainingHours(int hour)
     {
@@ -121,21 +155,29 @@ class Customer: public Human
         }
     }
 
-    void SetCertificate(bool earned)
+    bool GetCertificate()
     {
-        Did_Earn_A_Certificate = earned;
+        return 
+        Certificate;
     }
 
+    void SetCertificate(bool earned)
+    {
+        
+        Certificate = earned;
+    }
+    
+    
     void GetInformation()
     {
         cout<<"Name of the customer: "<<GetName()<<endl;
-        cout<<"The remaning hours customer have: "<<Remaining_Hours<<endl;
+        cout<<"The remaning hours customer have: "<<GetRemainingHours()<<endl;
         cout<<"The current dance that customer is learning: "<<EnumToString(GetCurrentDance())<<endl;
-        cout<<"Does customer have a certificate on current dance: "<<Did_Earn_A_Certificate<<endl;
+        cout<<"Does customer have a certificate on current dance: "<<GetCertificate()<<endl;
 
     }
 
-    void Dance() //I'm going to change the cout
+    void Dance() //I'm going to change the couts
     {
         if(GetProfessionOnCurrentDance()<=0)
         {
@@ -157,56 +199,141 @@ class Customer: public Human
         
 
     }
+
+    Customer(string name, int age, int money, DanceStyle current_Dance, bool is_male): Human(name,age,money,current_Dance,is_male)
+    {
+        Remaining_Hours = 10 // Because every customer who joins the studio gets 10 hours in the start;
+        Certificate = false; 
+    }
     
 };
 
 class Instructor: public Human 
 {
     private:
-
     int Lesson_Count = 0;
-
-    virtual void SetDanceType(DanceTypes type)
+    
+    protected:
+    void DanceWithCustomer() // This function going to be inside of Dance(). Thats why I made c private.
     {
-        Current_Dance = type;
-        cout<<Name<< "change their dance style"<<endl;
+        cout<<GetName()<<" is dancing with the customer"<<endl;
     }
 
-    void DanceWithCustomer() // This function going to be inside of Dance(). Thats why I made it private.
+    void GiveCertificate(Customer& customer) // This function going to be inside of Dance(). Thats why I made c private.
     {
-        cout<<Name<<" is dancing with the customer"<<endl;
-    }
-
-
-    void GiveCertificate(Customer customer)
-    {
-        cout<<Name<<" is giving a certificate to the customer"<<endl;
+        cout<<GetName()<<" is giving a certificate to the customer"<<endl;
         customer.SetCertificate(true);
     }
 
 
     public:
 
+    void SetDanceType(DanceStyle style)
+    {
+       cout<<"System Error! Instructors cant change their current dance style";
+    }
+
     void Dance()
     {
-        cout<<"Instructor performing "<<GetCurrentDance()<<endl;
+        cout<<"Instructor performing "<<EnumToString(GetCurrentDance())<<endl;
     }
 
     void GetInformation()
     {
-        cout<<Name<<" is the instructor of "<<EnumToString(GetCurrentDance())<<" in our dance studio"<<endl;
+        cout<<GetName()<<" is the instructor of "<<EnumToString(GetCurrentDance())<<" in our dance studio"<<endl;
     }
 
-    virtual void GiveALesson(int PersonNumber, int hour) = 0; // This function is pure virtual because every dance lesson have different parameters
+    virtual void GiveALesson(int personNumber, int hour, int max_student_number) = 0; // This function is pure virtual because every dance lesson have different parameters
 
-    Instructor(string name, int age, int money, DanceTypes current_Dance) : Human(name, age, money, current_Dance)
+    Instructor(string name, int age, int money, DanceStyle current_Dance,bool is_male) : Human(name, age, money, current_Dance, is_male)
     {
         Lesson_Count = 0;
     }
 };
 
+class SalsaInstructor: public Instructor
+{
+    void GiveALesson(int personNumber, int hour)
+    {
+
+    }
+};
+
+
+void BuyHour(int hour, Customer customer)
+{
+   int cost = hour * 20;
+    if(customer.GetMoney()>=cost)
+    {
+        customer.SetMoney(-cost);
+        customer.SetRemainingHours(hour);
+        cout<<customer.GetName()<<" bought "<<hour<<" hours of dance lesson"<<endl;
+    }
+    else
+    {
+         cout<<customer.GetName()<<" does not have enough money!"<<endl;
+    }
+
+}
+
+void RefundRemaningHours(int hour, Human& human)
+{
+    int money = hour * 5;
+    human.SetMoney(money);
+    cout<<human.GetName()<<" refunded "<<hour<<" hours of dance lesson"<<endl;
+}
+
+
+bool CheckForTheHours(list<Customer*> customer, int lesson_hour)
+{
+    for(Customer* c: customer)
+        if(c->GetRemainingHours()<lesson_hour)
+        {
+            cout<<c->GetName()<<" does not have any remaining hours!"<<endl;
+            return false;
+        }
+    
+    for(Customer* c: customer) // if I implemented this above in the else condition if one customer does not have any remaining hour function going to return false.
+
+        c->SetRemainingHours(-lesson_hour);
+
+    
+
+    return true;
+}
+
+bool CheckForThePairs(list<Customer*> customer) 
+{
+    int male_counter = 0;
+    int female_counter = 0;
+
+    for(Customer* c: customer)
+    {
+        if(c->GetGender()) // If it is true so this means its male;
+        {
+            male_counter++;
+        }
+        else
+        {
+            female_counter++;
+        }
+        
+    }
+
+    if(female_counter == male_counter)
+    {
+        return true;
+    }
+    else
+    {
+        cout<<"The lesson cant be done because there are no equal customer number to make pairs"<<endl;
+        return false;
+    }
+}
+
 int main()
 {
-
+    list<customers> customers = {};
+    
     return 0;
 }
