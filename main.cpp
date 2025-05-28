@@ -417,10 +417,19 @@ class Instructor: public Human
             }
         }
 
+        cout<<customers_Can_Able_To_Dance.size()<<" customers can able to perform this dance"<<endl;
         if(customers_Can_Able_To_Dance.size()>0)
-        Teach(customers_Can_Able_To_Dance, 2);
-        vector<Customer *> customers_going_to_get_certificate = CheckForTheLevel(customers);
+        {
+            Teach(customers_Can_Able_To_Dance, 2);
+        }
+        else
+        {
+            cout<<"There is no customer that can able to perform this dance"<<endl;
+            customers.clear();  
+            return;
+        }
 
+        vector<Customer *> customers_going_to_get_certificate = CheckForTheLevel(customers);
         if(customers_going_to_get_certificate.size()>0)
         {
             for(Customer* c: customers_going_to_get_certificate)
@@ -557,6 +566,47 @@ class FolkInstructor: public Instructor
 
 };
 
+class HipHopInstructor: public Instructor
+{
+    public:
+    // I generated these couts with AI because I dont have any idea about dance terms...
+    void PlayStarterMusic()
+    {
+        cout << "Now playing: 'Hip Hop Hooray' — the beat drops and the studio comes alive..." << endl;
+    }
+
+    void StarterLessonStarts()
+    {
+        cout << "The instructor finishes their final move, the room buzzing with energy." << endl;
+        cout << "Now it's their turn to step up and show what they've got." << endl;
+    }
+    void PlayIntermediateMusic()
+    {
+        cout << "Now playing: 'Lose Yourself' — the rhythm intensifies, pushing everyone to their limits..." << endl;
+    }
+
+    void IntermediateLessonStarts()
+    {
+        cout << "The instructor’s last move leaves the room in awe, the energy palpable." << endl;
+        cout << "Now it's time to take on the challenge and dance with passion." << endl;
+    }
+
+    void PrivateLessonStarts()
+    {
+        cout << "The bass thumps as the instructor guides their student through the intricate footwork of hip hop." << endl;
+        cout << "Every move is sharp, every beat is felt deep in the soul." << endl;
+        cout << "The instructor’s eyes are focused, ensuring each step is executed with precision." << endl;
+        cout << "The student mirrors the instructor, gaining confidence with every beat." << endl;
+        cout << "As the final note fades, the room is charged with the energy of a lesson well learned." << endl;
+        cout << "The instructor smiles, knowing that this private lesson has brought them closer to mastering the art of hip hop." << endl;
+    }
+
+    HipHopInstructor(string name, int age, int salary, DanceStyle dance, bool isCertified, int minAge, int maxAge, int minProfession) : Instructor(name, age, salary, dance, isCertified, minAge, maxAge, minProfession) 
+    {
+
+    }
+};
+
 int main()
 {
     bool using_Program = true;
@@ -582,9 +632,9 @@ int main()
     Customer* elisa = new Customer("Elisa", 19, 50, DanceStyle::Folk, false);
     Customer* carlo = new Customer("Carlo", 27, 90, DanceStyle::HipHop, false);
 
-    SalsaInstructor* laura = new SalsaInstructor("Laura", 22, 250, DanceStyle::Salsa, false, 10, 30, 1);
-    SalsaInstructor* eren = new SalsaInstructor("Eren", 54, 250, DanceStyle::Folk, true, 20, 15, 6);
-    
+    SalsaInstructor* laura = new SalsaInstructor("Laura", 22, 250, DanceStyle::Salsa, false, 10, 30, 10);
+    FolkInstructor* eren = new FolkInstructor("Eren", 54, 250, DanceStyle::Folk, true, 20, 15, 6);
+    HipHopInstructor* giada = new HipHopInstructor("Giada", 30, 300, DanceStyle::HipHop, false, 15, 40, 4);
 
     customers.push_back(rosy);
     customers.push_back(emir);
@@ -594,6 +644,7 @@ int main()
 
     instructors.push_back(eren);
     instructors.push_back(laura);
+    instructors.push_back(giada);
 
 
     while(using_Program)
@@ -991,19 +1042,23 @@ void ChangeCustomerInformation(Customer* customer)
 // Functions about Lesson Section
 void DoTheLesson(Instructor* instructor,vector<Customer*> customers,int lesson_type)
 {
-        if(instructor->GetCurrentDance() == DanceStyle::Salsa && lesson_type != 3)
-        
-        if(!CheckForThePairs(customers))
-        return;
 
         if(lesson_type == 3 && customers.size()>1)
         {
             cout<<"Error! The private lesson can be done with only one student!!!"<<endl;
+            return;
         }
-        if(lesson_type != 3 && customers.size() ==0)
+        if(lesson_type != 3 && customers.size() ==1)
         {
             cout<<"Error! The group lesson can be done with at least two student!!!"<<endl;
+            return;
         }
+
+
+        if(instructor->GetCurrentDance() == DanceStyle::Salsa && lesson_type != 3)    
+        if(!CheckForThePairs(customers))
+        return;
+
 
             
     
@@ -1019,7 +1074,7 @@ void DoTheLesson(Instructor* instructor,vector<Customer*> customers,int lesson_t
 
                     case 2:
                         instructor->GiveAnIntermadiateLesson(customers);
-
+                    break;
                     case 3:
                         instructor->GiveAPrivateLesson(customers, instructor->GetCostOfPrivateLesson());
                     break;
