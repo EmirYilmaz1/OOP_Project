@@ -2,6 +2,11 @@
 #include<cmath>
 #include<list> //So I thought that list is c++ is exactly same with c#... So after checking runtime I understood that I have to change all list to vector... But I didnt want to delete this line because when I see this I will always remember that I need to check things from internet when Im not sure. 
 #include<vector>
+#include <cassert>
+
+
+#define TESTS
+
 
 
 using namespace std;
@@ -34,6 +39,11 @@ string EnumToString(DanceStyle dance_Style)
         return "ErrorCode#010 In the system this customer does not have any dance program!";
     }
 }
+
+
+#ifdef TESTS
+void RunTests();
+#endif
 
 void DoTheLesson(Instructor* instructor,vector<Customer*> customers,int lesson_type);
 void ChangeCustomerInformation(Customer* customer);
@@ -609,6 +619,10 @@ class HipHopInstructor: public Instructor
 
 int main()
 {
+    #ifdef TESTS
+    RunTests();
+    #endif
+
     bool using_Program = true;
     bool isPrivateLesson = false;
 
@@ -854,6 +868,27 @@ int main()
     }
 
 }
+
+#ifdef TESTS
+    void RunTests() 
+    {
+        cout << "Testing Started" << endl;
+     
+        Customer* test_Customer = new Customer("TestUser", 25, 200, DanceStyle::HipHop, true);
+        assert(test_Customer->GetRemainingHours() == 10); 
+
+        BuyHour(2, test_Customer);
+        assert(test_Customer->GetRemainingHours() == 12); 
+
+        RefundRemaningHours(5, test_Customer);
+        assert(test_Customer->GetRemainingHours() == 7); 
+
+        cout << "TestUser final remaining hours: " << test_Customer->GetRemainingHours() << endl;
+        assert(test_Customer->GetMoney() == 200 - 40 + 25); 
+
+        cout << "All tests passed successfully" << endl;
+    }
+#endif
 
 // Functions about Instructor sections
 /* void SelectAndShowInfo(vector<Human*> humans) 
